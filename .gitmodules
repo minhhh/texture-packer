@@ -1,0 +1,6 @@
+[submodule "onejar"]
+	path = onejar
+	url = https://github.com/stigkj/one-jar.git
+[submodule "docopt"]
+	path = docopt
+	url = https://github.com/docopt/docopt.git
