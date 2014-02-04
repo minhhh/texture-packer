@@ -11,9 +11,9 @@ public class Main {
         System.arraycopy(args, 0, argv, 1, args.length);
         PySystemState.initialize(PySystemState.getBaseProperties(), null, argv);
 
-        PythonInterpreter intrp = new PythonInterpreter(null, new PySystemState());
+        PythonInterpreter intrp = new PythonInterpreter();
         PySystemState sys = Py.getSystemState();
-        sys.path.append(new PyString("__pyclasspath__/libpython/"));
+        sys.path.append(new PyString("__pyclasspath__/lib/modules.jar"));
 
         intrp.exec("import main");
         intrp.exec("main.main()");

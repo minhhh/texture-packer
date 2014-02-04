@@ -1,15 +1,16 @@
 <project name="TexturePacker" default="dist" basedir=".">
 
-    <property name="jar.name" value="TexturePacker.jar" />
+    <property name="jar.name" value="out/TexturePacker.jar" />
     <property name="java-main-class" value="Main" />
 
     <!-- Project configs -->
     <property name="src.dir" location="src"/>
     <property name="java-src.dir" location="java-src"/>
-    <property name="onejar-src.dir" location="onejar/src"/>
+    <property name="onejar-src.dir" location="onejar-src"/>
     <property name="java-build.dir" location="java-build"/>
     <property name="build.dir" location="build"/>
     <property name="lib.dir" location="lib"/>
+    <property name="lib.python.dir" location="libpython"/>
     <property name="out.dir" location="out"/>
 
     <path id="classpath">
@@ -41,6 +42,9 @@
         <copy todir="${build.dir}">
             <fileset dir="${src.dir}"/>
         </copy>
+        <copy todir="${build.dir}">
+            <fileset dir="${lib.python.dir}"/>
+        </copy>
         <!-- Add the libs -->
         <copy todir="${build.dir}/lib">
             <fileset dir="${lib.dir}"/>
@@ -48,9 +52,9 @@
         <!-- Compile OneJar -->
         <javac srcdir="${onejar-src.dir}" destdir="${build.dir}" classpathref="classpath"/>
         <!-- Copy the OneJar license file -->
-        <copy file="${onejar-src.dir}/../doc/one-jar-license.txt" tofile="${build.dir}/one-jar-license.txt" />
+        <copy file="${onejar-src.dir}/one-jar-license.txt" tofile="${build.dir}/one-jar-license.txt" />
         <!-- Build the jar -->
-        <!-- <mkdir dir="${out.dir}"/> -->
+        <mkdir dir="${out.dir}"/>
         <jar destfile="${jar.name}" basedir="${build.dir}">
             <manifest>
                 <attribute name="Main-Class" value="com.simontuffs.onejar.Boot" />

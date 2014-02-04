@@ -22,7 +22,7 @@ General Options:
   -s SHEET --sheet=SHEET      Name of the sheet to write, supported formats:
                                   png     - 32bit, allows all pixel formats
                               [default: out.png]
-  -d DATA --data=DATA         Name of the data file to write [default: out]
+  -d DATA --data=DATA         Name of the data file to write [default: out.plist]
   -f FORMAT --format=FORMAT   Format to write [default: cocos2d]
                               Available formats:
                                 cocos2d             plist format for cocos2d

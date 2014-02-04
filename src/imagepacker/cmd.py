@@ -158,6 +158,7 @@ def scaleSize(width, height, fixed_width, fixed_height, max_width, max_height, s
     return failed_scale, new_width, new_height
 
 def packData(frmObjs, width, height, args):
+    fp = None
     header = """
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
