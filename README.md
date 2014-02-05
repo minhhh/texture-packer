@@ -9,7 +9,7 @@ A jython command line implementation of the popular TexturePacker.
 
 ### Parameters
 
-    Usage: ImagePacker [--sheet=SHEET] [--data=DATA] [--format=FORMAT]
+    Usage: ImagePacker [--texture=TEXTURE] [--data=DATA] [--format=FORMAT]
                     [--algorithm=ALG [--maxrects-heuristics=HEURISTIC]]
                     [--rotation | --no-rotation]
                     ( ((--width=WIDTH | --max-width=MAXWIDTH) (--height=HEIGHT | --max-height=MAXHEIGHT)) | (--force-squared (--max-size=MAXSIZE | --size=SIZE)) )
@@ -27,17 +27,17 @@ A jython command line implementation of the popular TexturePacker.
                 or directories.
 
     General Options:
-    -h --help                   Show this help message and exit
-    --version                   Print version information
-    -s SHEET --sheet=SHEET      Name of the sheet to write, supported formats:
-                                    png     - 32bit, allows all pixel formats
-                                [default: out.png]
-    -d DATA --data=DATA         Name of the data file to write [default: out.plist]
-    -f FORMAT --format=FORMAT   Format to write [default: cocos2d]
-                                Available formats:
-                                    cocos2d             plist format for cocos2d
-    -a ALG --algorithm=ALG      Choose algorithm
-                                    MaxRects        Powerful packing algorithm (extended)
+    -h --help                         Show this help message and exit
+    --version                         Print version information
+    -t TEXTURE --texture=TEXTURE      Name of the output texture, supported formats:
+                                        png     - 32bit, allows all pixel formats
+                                        [default: out.png]
+    -d DATA --data=DATA               Name of the data file to write [default: out.plist]
+    -f FORMAT --format=FORMAT         Format to write [default: cocos2d]
+                                        Available formats:
+                                            cocos2d             plist format for cocos2d
+    -a ALG --algorithm=ALG            Choose algorithm
+                                            MaxRects        Powerful packing algorithm (extended)
     --maxrects-heuristics=HEURISTICS  Heuristics [default: best]
                                             best              Detects best option
                                             shortsidefit      Short side fit
@@ -47,16 +47,16 @@ A jython command line implementation of the popular TexturePacker.
                                             areafit           Area fit
 
     Rotation Options:
-    --rotation                  Allow rotation. Enable by default.
-    --no-rotation               Not allow rotation
+    --rotation                        Allow rotation
+    --no-rotation                     Not allow rotation
 
     Auto Alias Options:
-    --enable-alias			  Enable auto alias mode.
-    --disable-alias			  Disable auto alias mode.
+    --enable-alias                    Enable auto alias mode.
+    --disable-alias                   Disable auto alias mode.
 
     Decrease Color Options:
-    --decreasecolor             Decrease color
-    --no-decreasecolor          No decrease color
+    --decreasecolor                   Decrease color
+    --no-decreasecolor                No decrease color
 
     Dimensions Options:
     --width=WIDTH                   Sets fixed width for texture
@@ -86,7 +86,7 @@ Show help
 Pack files and/or folders of images
 
     java -jar out/TexturePacker.jar "macrotests/imgs/arm0.png" "macrotests/imgs/arm1.png"
-    --force-squared --max-size=1024 --shape-padding=2 --border-padding=1 --sheet="out.png" --data="out.plist"
+    --force-squared --max-size=1024 --shape-padding=2 --border-padding=1 --texture="out.png" --data="out.plist"
 
 
 ### RELEASE NOTES

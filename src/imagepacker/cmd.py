@@ -76,7 +76,7 @@ def getPixelRGBA(imgData, row, col):
 
 def packImages(imageDataList, width, height, args):
     result = True
-    oFile = java.io.File(args['--sheet'])
+    oFile = java.io.File(args['--texture'])
     wr = None
     try:
         imi = ImageInfo(width, height, 8, True)
