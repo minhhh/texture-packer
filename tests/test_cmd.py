@@ -79,6 +79,14 @@ class PngjTest(unittest.TestCase):
 
     def testReadFileList(self):
         fl = cmd.readFileList(["macrotests/imgs/arm0.png", "macrotests/imgs"])
-        self.assertEqual(fl, ['macrotests/imgs/arm0.png', 'macrotests/imgs/arm0.png', 'macrotests/imgs/arm1.png', 'macrotests/imgs/arm2.png', 'macrotests/imgs/cover0.png', 'macrotests/imgs/cover1.png', 'macrotests/imgs/cover2.png'] )
+        self.assertEqual(fl,  ['macrotests/imgs/arm0.png',
+                                'macrotests/imgs/arm0.png',
+                                'macrotests/imgs/arm1.png',
+                                'macrotests/imgs/arm2.png',
+                                'macrotests/imgs/Boss-0.png',
+                                'macrotests/imgs/Boss-1.png',
+                                'macrotests/imgs/cover0.png',
+                                'macrotests/imgs/cover1.png',
+                                'macrotests/imgs/cover2.png'] )
 
 

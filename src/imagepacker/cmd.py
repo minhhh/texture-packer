@@ -2,7 +2,9 @@ import os, sys
 from os import walk
 import maxrect
 from ar.com.hjg.pngj import PngReader, PngWriter, ImageLineHelper, ImageInfo, ImageLineInt
+from ar.com.hjg.pngj.chunks import PngChunkPLTE, ChunksList, PngChunkIHDR, PngChunkTRNS
 import java
+from java.nio import ByteBuffer
 
 def readFileList(fl):
     result = []
@@ -39,6 +41,7 @@ def tryFit(frmObjs, width, height, heuristics, allow_rotation, shape_padding, bo
     mr = maxrect.MaxRects(width, height, heuristicsCls(allow_rotation, shape_padding, border_padding), shape_padding, border_padding)
     return mr.insertFrmObjs(frmObjs)
 
+TWO_MAXINT = 2 * sys.maxint + 2
 def getFileData(frmObjs):
     result = []
     for frmObj in frmObjs:
@@ -46,11 +49,29 @@ def getFileData(frmObjs):
         try:
             pr = PngReader(java.io.File(frmObj.name))
             imgData = []
+            pal, trns = None, None
+            if pr.imgInfo.indexed:
+                pal = pr.getMetadata().getPLTE()
+                trns = pr.getChunksList().getById(PngChunkTRNS.ID)[0]
             for i in range(pr.imgInfo.rows):
                 imgLine = pr.readRow(i)
                 buf = []
-                for j in range(pr.imgInfo.cols):
-                    buf.append(ImageLineHelper.getPixelARGB8(imgLine, j))
+                line_buf = []
+                if pr.imgInfo.indexed:
+                    line_buf = ImageLineHelper.palette2rgba(imgLine, pal, trns, None)
+                    for j in range(pr.imgInfo.cols):
+                        offset = j * 4
+                        pixel = ((line_buf[offset + 3] & 0xff) << 24) | ((line_buf[offset] & 0xff) << 16) | ((line_buf[offset + 1] & 0xff) << 8) | ((line_buf[offset + 2] & 0xff))
+                        if pixel > sys.maxint:
+                            pixel = pixel - TWO_MAXINT
+                        buf.append(pixel)
+                else:
+                    for j in range(pr.imgInfo.cols):
+                        if pr.imgInfo.alpha:
+                            buf.append(ImageLineHelper.getPixelARGB8(imgLine, j))
+                        else:
+                            buf.append((-1 << 24) | ImageLineHelper.getPixelRGB8(imgLine, j))
+
                 imgData.append(buf)
             result.append({"data": imgData, "frmObj": frmObj})
         finally:
@@ -84,7 +105,8 @@ def packImages(imageDataList, width, height, args):
         for i in range(height):
             imgLine = ImageLineInt(imi)
             for j in range(width):
-                ImageLineHelper.setPixelRGBA8(imgLine, j, getPixelRGBA(imageDataList, i, j))
+                pixel = getPixelRGBA(imageDataList, i, j)
+                ImageLineHelper.setPixelRGBA8(imgLine, j, pixel)
             wr.writeRow(imgLine)
         wr.end()
     except Exception as e:

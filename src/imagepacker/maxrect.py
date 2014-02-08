@@ -33,7 +33,7 @@ class MRHeuristicsType(object):
 
     @staticmethod
     def get(i):
-        return (MRHShortSideFit, MRHLongSideFit, MRHLongSideFit, MRHLongSideFit, MRHLongSideFit, MRHLongSideFit)[i]
+        return (MRHShortSideFit, MRHShortSideFit, MRHShortSideFit, MRHShortSideFit, MRHShortSideFit, MRHShortSideFit)[i]
 
 MAX              = sys.maxsize
 
@@ -202,6 +202,7 @@ class MaxRects(object):
         return self._freeRects
 
     def printFreeRects(self):
+        print '----------------'
         for rect in self._freeRects:
             print rect
 
@@ -253,6 +254,8 @@ class MaxRects(object):
                     elif rect.x + rect.w < r.x + r.w:
                         newpos = PixelRect(rect.x + rect.w, r.y, r.x + r.w - (rect.x + rect.w), r.h)
                         self.freeRects.append(newpos)
+                if rect.x == r.x and rect.y == r.y and rect.w == r.w and rect.h == r.h:
+                    to_be_del.append(i)
                 if newpos is not None:
                     to_be_del.append(i)
         self._freeRects = [r for i, r in enumerate(self.freeRects) if i not in to_be_del]
