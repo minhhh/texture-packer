@@ -52,19 +52,28 @@ def getFileData(frmObjs):
             pal, trns = None, None
             if pr.imgInfo.indexed:
                 pal = pr.getMetadata().getPLTE()
-                trns = pr.getChunksList().getById(PngChunkTRNS.ID)[0]
+                trns = pr.getChunksList().getById(PngChunkTRNS.ID)
+                trns = trns[0] if len(trns) else None
             for i in range(pr.imgInfo.rows):
                 imgLine = pr.readRow(i)
                 buf = []
                 line_buf = []
                 if pr.imgInfo.indexed:
                     line_buf = ImageLineHelper.palette2rgba(imgLine, pal, trns, None)
-                    for j in range(pr.imgInfo.cols):
-                        offset = j * 4
-                        pixel = ((line_buf[offset + 3] & 0xff) << 24) | ((line_buf[offset] & 0xff) << 16) | ((line_buf[offset + 1] & 0xff) << 8) | ((line_buf[offset + 2] & 0xff))
-                        if pixel > sys.maxint:
-                            pixel = pixel - TWO_MAXINT
-                        buf.append(pixel)
+                    if trns:
+                        for j in range(pr.imgInfo.cols):
+                            offset = j * 4
+                            pixel = ((line_buf[offset + 3] & 0xff) << 24) | ((line_buf[offset] & 0xff) << 16) | ((line_buf[offset + 1] & 0xff) << 8) | ((line_buf[offset + 2] & 0xff))
+                            if pixel > sys.maxint:
+                                pixel = pixel - TWO_MAXINT
+                            buf.append(pixel)
+                    else:
+                        for j in range(pr.imgInfo.cols):
+                            offset = j * 3
+                            pixel = (-1 << 24) | ((line_buf[offset] & 0xff) << 16) | ((line_buf[offset + 1] & 0xff) << 8) | ((line_buf[offset + 2] & 0xff))
+                            if pixel > sys.maxint:
+                                pixel = pixel - TWO_MAXINT
+                            buf.append(pixel)
                 else:
                     for j in range(pr.imgInfo.cols):
                         if pr.imgInfo.alpha:
