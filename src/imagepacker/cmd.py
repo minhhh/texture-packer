@@ -151,16 +151,25 @@ def processImages(frmObjs, args):
     if fixed_size:
         width = height = fixed_size
 
-    canFit = False
-    failed = False
+    total_area, canFit, failed = cal_total_area(frmObjs), False, False
     while not canFit and not failed:
-        canFit = tryFit(frmObjs, width, height, heuristics, allow_rotation, shape_padding, border_padding)
+        if width * height < total_area:
+            canFit = False
+        else:
+            canFit = tryFit(frmObjs, width, height, heuristics, allow_rotation, shape_padding, border_padding)
         if not canFit:
-            failed, width, height = scaleSize(width, height, fixed_width, fixed_height, max_width, max_height, fixed_size, max_size)
+            failed, width, height = scale_size(width, height, fixed_width, fixed_height, max_width, max_height, fixed_size, max_size)
 
     return canFit, width, height
 
-def scaleSize(width, height, fixed_width, fixed_height, max_width, max_height, size, max_size):
+def cal_total_area(frmObjs):
+    result = 0
+    for frmObj in frmObjs:
+        result += frmObj.sourceColorRect.w * frmObj.sourceColorRect.h
+
+    return result
+
+def scale_size(width, height, fixed_width, fixed_height, max_width, max_height, size, max_size):
     failed_scale = True
     new_height = height
     new_width = width

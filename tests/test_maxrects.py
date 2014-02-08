@@ -78,8 +78,9 @@ class MaxRectsTest(unittest.TestCase):
         mr.insertFrmObjs(frmObjs)
 
         self.assertEqual(frmObjs[0].frame, maxrect.PixelRect(0, 0, 32, 32))
+        self.assertEqual(frmObjs[1].frame, maxrect.PixelRect(0, 33, 32, 32))
         self.assertEqual(frmObjs[9].frame, maxrect.PixelRect(33, 66, 32, 32))
-        self.assertEqual(frmObjs[10].frame, maxrect.PixelRect(33, 33, 32, 32))
+        self.assertEqual(frmObjs[10].frame, maxrect.PixelRect(33, 99, 32, 32))
 
 
 

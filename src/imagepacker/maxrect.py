@@ -23,6 +23,10 @@ class PixelRect(object):
     def __str__(self):
         return "x:%s y:%s w:%s h:%s" % (self.x, self.y, self.w, self.h)
 
+    def contains(self, r):
+        return self.x <= r.x and self.y <= r.y and self.x + self.w >= r.x + r.w and self.y + self.h >= r.y + r.h
+
+
 class MRHeuristicsType(object):
     RECTBESTSHORTSIDEFIT = 0
     RECTBOTTOMLEFTRULE   = 1
@@ -235,6 +239,8 @@ class MaxRects(object):
         rect = copy.copy(frmObj.frame)
         if frmObj.rotated:
             rect.w, rect.h = rect.h, rect.w
+
+        # Split all the intersect rects
         for i, r in enumerate(self.freeRects):
             if rect.x + rect.w <= r.x or rect.x >= r.x + r.w or rect.y + rect.h <= r.y or rect.y >= r.y + r.h:
                 continue
@@ -259,6 +265,19 @@ class MaxRects(object):
                 if newpos is not None:
                     to_be_del.append(i)
         self._freeRects = [r for i, r in enumerate(self.freeRects) if i not in to_be_del]
-        return bool(to_be_del)
+        result = bool(to_be_del)
+
+        to_be_del = []
+        # remove redundant rects which are already contained in other rect
+        for i, ri in enumerate(self.freeRects):
+            for j, rj in enumerate(self.freeRects):
+                if i == j or i in to_be_del or j in to_be_del:
+                    continue
+                else:
+                    if ri.contains(rj):
+                        to_be_del.append(j)
+        self._freeRects = [r for i, r in enumerate(self.freeRects) if i not in to_be_del]
+
+        return result
 
 

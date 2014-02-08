@@ -48,33 +48,33 @@ class PngjTest(unittest.TestCase):
 
 
     def testScaleSize(self):
-        failed, width, height = cmd.scaleSize(16, 16, None, None, 128, 128, None, None)
+        failed, width, height = cmd.scale_size(16, 16, None, None, 128, 128, None, None)
         self.assertFalse(failed)
         self.assertEqual(width, 16)
         self.assertEqual(height, 32)
 
-        failed, width, height = cmd.scaleSize(16, 32, None, None, 128, 128, None, None)
+        failed, width, height = cmd.scale_size(16, 32, None, None, 128, 128, None, None)
         self.assertFalse(failed)
         self.assertEqual(width, 32)
         self.assertEqual(height, 32)
 
-        failed, width, height = cmd.scaleSize(16, 128, None, None, 128, 128, None, None)
+        failed, width, height = cmd.scale_size(16, 128, None, None, 128, 128, None, None)
         self.assertFalse(failed)
         self.assertEqual(width, 32)
         self.assertEqual(height, 128)
 
-        failed, width, height = cmd.scaleSize(128, 128, None, None, 128, 128, None, None)
+        failed, width, height = cmd.scale_size(128, 128, None, None, 128, 128, None, None)
         self.assertTrue(failed)
 
-        failed, width, height = cmd.scaleSize(128, 128, 128, 128, None, None, None, None)
+        failed, width, height = cmd.scale_size(128, 128, 128, 128, None, None, None, None)
         self.assertTrue(failed)
 
-        failed, width, height = cmd.scaleSize(16, 16, None, None, None, None, None, 64)
+        failed, width, height = cmd.scale_size(16, 16, None, None, None, None, None, 64)
         self.assertFalse(failed)
         self.assertEqual(width, 32)
         self.assertEqual(height, 32)
 
-        failed, width, height = cmd.scaleSize(64, 64, None, None, None, None, None, 64)
+        failed, width, height = cmd.scale_size(64, 64, None, None, None, None, None, 64)
         self.assertTrue(failed)
 
     def testReadFileList(self):
