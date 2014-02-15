@@ -95,7 +95,7 @@ def getPixelRGBA(imgData, row, col):
             and col < data["frmObj"].frame.x + data["frmObj"].frame.h \
             and row >= data["frmObj"].frame.y \
             and row < data["frmObj"].frame.y + data["frmObj"].frame.w:
-                return data["data"][col - data["frmObj"].frame.x + data["frmObj"].offset[1]][data["frmObj"].frame.w - 1 - row + data["frmObj"].frame.y + data["frmObj"].offset[0]]
+                return data["data"][data["frmObj"].frame.h - 1 - col + data["frmObj"].frame.x + data["frmObj"].offset[1]][row - data["frmObj"].frame.y + data["frmObj"].offset[0]]
         else:
             if col >= data["frmObj"].frame.x \
             and col < data["frmObj"].frame.x + data["frmObj"].frame.w \
