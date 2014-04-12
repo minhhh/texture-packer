@@ -6,6 +6,8 @@ from ar.com.hjg.pngj.chunks import PngChunkPLTE, ChunksList, PngChunkIHDR, PngCh
 import java
 from java.nio import ByteBuffer
 
+ARGS = {}
+
 def readFileList(fl):
     result = []
     for filename in fl:
@@ -47,18 +49,22 @@ def getFileData(frmObjs):
     for frmObj in frmObjs:
         pr = None
         try:
+            if ARGS['--verbose']:
+                print "Processing ", frmObj.name
             pr = PngReader(java.io.File(frmObj.name))
             imgData = []
             pal, trns = None, None
-            if pr.imgInfo.indexed:
-                pal = pr.getMetadata().getPLTE()
-                trns = pr.getChunksList().getById(PngChunkTRNS.ID)
-                trns = trns[0] if len(trns) else None
+            pal = pr.getMetadata().getPLTE()
+            # trns = pr.getChunksList().getById(PngChunkTRNS.ID)
+            # trns = trns[0] if len(trns) else None
+            trns = pr.getMetadata().getTRNS()
+
             for i in range(pr.imgInfo.rows):
                 imgLine = pr.readRow(i)
+                ImageLineHelper.scaleUp(imgLine)
                 buf = []
                 line_buf = []
-                if pr.imgInfo.indexed:
+                if pr.imgInfo.indexed: # INDEXED PNG
                     line_buf = ImageLineHelper.palette2rgba(imgLine, pal, trns, None)
                     if trns:
                         for j in range(pr.imgInfo.cols):
@@ -74,12 +80,26 @@ def getFileData(frmObjs):
                             if pixel > sys.maxint:
                                 pixel = pixel - TWO_MAXINT
                             buf.append(pixel)
-                else:
+                else: # RGB PNG
                     for j in range(pr.imgInfo.cols):
-                        if pr.imgInfo.alpha:
-                            buf.append(ImageLineHelper.getPixelARGB8(imgLine, j))
+                        if ARGS['--verbose']:
+                            print j, pr.imgInfo, pr.imgInfo.cols
+
+                        if pr.imgInfo.greyscale:
+                            ga = trns.getGray() if trns else -1
+                            line_buf = imgLine.scanline
+                            offset = j * 2 if pr.imgInfo.alpha else j
+                            g = line_buf[offset]
+                            alpha = (line_buf[offset + 1] & 0xFF) if pr.imgInfo.alpha else (255 if g != ga else 0)
+                            pixel = (alpha << 24) | ((g & 0xff) << 16) | ((g & 0xff) << 8) | ((g & 0xff))
+                            if pixel > sys.maxint:
+                                pixel = pixel - TWO_MAXINT
+                            buf.append(pixel)
                         else:
-                            buf.append((-1 << 24) | ImageLineHelper.getPixelRGB8(imgLine, j))
+                            if pr.imgInfo.alpha:
+                                buf.append(ImageLineHelper.getPixelARGB8(imgLine, j))
+                            else:
+                                buf.append((-1 << 24) | ImageLineHelper.getPixelRGB8(imgLine, j))
 
                 imgData.append(buf)
             result.append({"data": imgData, "frmObj": frmObj})
@@ -239,7 +259,8 @@ MR_HEURISTICS = {
 }
 
 def launch(args):
-    # print args
+    global ARGS
+    ARGS = args
     filelist = readFileList(args['FILE'])
     frmObjs = readImageInfo(filelist)
 

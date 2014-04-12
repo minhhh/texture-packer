@@ -31,8 +31,8 @@ for testcase in $testcases; do
     echo -n "Executing $testcase..."
     TMPDIR=`mktemp -d "imagepacker-${testcase}.XXXXXX"`
     OUTPUT="${TMPDIR}.log"
-    # ( cd $TMPDIR && . $TESTDIR/${testcase} >$OUTPUT 2>&1 ) ||
-    ( cd $TMPDIR && source $TESTDIR/${testcase} ) ||
+    ( cd $TMPDIR && . $TESTDIR/${testcase} >$OUTPUT 2>&1 ) ||
+    # ( cd $TMPDIR && source $TESTDIR/${testcase} ) ||
         {
 	    cat $TMPDIR/$OUTPUT
 	    echo "*** Test case $testcase failed ($TMPDIR)"

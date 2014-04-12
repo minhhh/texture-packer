@@ -24,11 +24,14 @@ clean: # clean
 	ant clean
 
 run: # Run texture-packer with jython
-	jython -Dpython.path=$(SRC):lib/$(JSON_SIMPLE) -c "import main; main.main()"
+	jython -Dpython.path=$(SRC):lib/$(PNGJ) -c "import main; main.main()"
 
 test: # Run unittest
 	jython -Dpython.path=lib/$(JSON_SIMPLE):lib/$(PNGJ):src:libpython -m unittest discover
 
-macrotest: # Run macrotest
+macrotest: clean-macrotest # Run macrotest
 	cd macrotests && ./macrotest.sh
+
+clean-macrotest: # Clean macrotest
+	cd macrotests && rm -fr imagepacker-test*
 

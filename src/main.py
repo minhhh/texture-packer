@@ -7,6 +7,7 @@ Usage: ImagePacker [--texture=TEXTURE] [--data=DATA] [--format=FORMAT]
                    [--shape-padding=SHAPEPADDING] [--border-padding=BORDERPADDING]
                    [--trim | --no-trim]
                    [--opt=OPT]
+                   [--verbose]
                    FILE...
        ImagePacker --version
 
@@ -35,6 +36,7 @@ General Options:
                                         bottomleft        Bottom left
                                         contactpoint      Contact point
                                         areafit           Area fit
+  -v --verbose                      Show verbose information
 
 Rotation Options:
   --rotation                        Allow rotation
@@ -79,7 +81,7 @@ from imagepacker import utils
 
 def main():
     try:
-        arguments = docopt(__doc__, version='TexturePacker 0.1')
+        arguments = docopt(__doc__, version='TexturePacker 0.1.1')
         print "Starting ..."
         import imagepacker.cmd
         imagepacker.cmd.launch(arguments)
