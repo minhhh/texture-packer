@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Usage: ImagePacker [--texture=TEXTURE] [--data=DATA] [--format=FORMAT]
                    [--algorithm=ALG [--maxrects-heuristics=HEURISTIC]]
@@ -7,7 +9,7 @@ Usage: ImagePacker [--texture=TEXTURE] [--data=DATA] [--format=FORMAT]
                    [--shape-padding=SHAPEPADDING] [--border-padding=BORDERPADDING]
                    [--trim | --no-trim]
                    [--opt=OPT]
-                   [--verbose]
+                   [-v --verbose]
                    FILE...
        ImagePacker --version
 
@@ -81,7 +83,7 @@ from imagepacker import utils
 
 def main():
     try:
-        arguments = docopt(__doc__, version='TexturePacker 0.1.1')
+        arguments = docopt(__doc__, version='TexturePacker 0.1.2')
         print "Starting ..."
         import imagepacker.cmd
         imagepacker.cmd.launch(arguments)

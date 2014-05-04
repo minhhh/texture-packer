@@ -17,9 +17,9 @@ class PngjTest(unittest.TestCase):
         allow_rotation = False
         heuristics = maxrect.MRHeuristicsType.RECTBESTSHORTSIDEFIT
         width, height = 128, 128
-        filelist = cmd.readFileList(["macrotests/imgs/arm0.png", "macrotests/imgs/arm1.png"])
-        frmObjs = cmd.readImageInfo(filelist)
-        canFit = cmd.tryFit(frmObjs, width, height, heuristics, allow_rotation, 0, 1)
+        filelist = cmd.read_file_list(["macrotests/imgs/arm0.png", "macrotests/imgs/arm1.png"])
+        frmObjs = cmd.read_image_info(filelist)
+        canFit = cmd.try_fit(frmObjs, width, height, heuristics, allow_rotation, 0, 1)
 
         self.assertEqual(frmObjs[0].frame, maxrect.PixelRect(1, 1, 52, 91))
         self.assertEqual(frmObjs[1].frame, maxrect.PixelRect(53, 1, 52, 91))
@@ -28,9 +28,9 @@ class PngjTest(unittest.TestCase):
         allow_rotation = False
         heuristics = maxrect.MRHeuristicsType.RECTBESTSHORTSIDEFIT
         width, height = 128, 128
-        filelist = cmd.readFileList(["macrotests/imgs/arm0.png", "macrotests/imgs/arm1.png"])
-        frmObjs = cmd.readImageInfo(filelist)
-        canFit = cmd.tryFit(frmObjs, width, height, heuristics, allow_rotation, 2, 1)
+        filelist = cmd.read_file_list(["macrotests/imgs/arm0.png", "macrotests/imgs/arm1.png"])
+        frmObjs = cmd.read_image_info(filelist)
+        canFit = cmd.try_fit(frmObjs, width, height, heuristics, allow_rotation, 2, 1)
 
         self.assertEqual(frmObjs[0].frame, maxrect.PixelRect(1, 1, 52, 91))
         self.assertEqual(frmObjs[1].frame, maxrect.PixelRect(55, 1, 52, 91))
@@ -39,9 +39,9 @@ class PngjTest(unittest.TestCase):
         allow_rotation = True
         heuristics = maxrect.MRHeuristicsType.RECTBESTSHORTSIDEFIT
         width, height = 256, 64
-        filelist = cmd.readFileList(["macrotests/imgs/arm0.png", "macrotests/imgs/arm1.png"])
-        frmObjs = cmd.readImageInfo(filelist)
-        canFit = cmd.tryFit(frmObjs, width, height, heuristics, allow_rotation, 2, 1)
+        filelist = cmd.read_file_list(["macrotests/imgs/arm0.png", "macrotests/imgs/arm1.png"])
+        frmObjs = cmd.read_image_info(filelist)
+        canFit = cmd.try_fit(frmObjs, width, height, heuristics, allow_rotation, 2, 1)
 
         self.assertEqual(frmObjs[0].frame, maxrect.PixelRect(1, 1, 52, 91))
         self.assertEqual(frmObjs[1].frame, maxrect.PixelRect(94, 1, 52, 91))
@@ -76,17 +76,4 @@ class PngjTest(unittest.TestCase):
 
         failed, width, height = cmd.scale_size(64, 64, None, None, None, None, None, 64)
         self.assertTrue(failed)
-
-    def testReadFileList(self):
-        fl = cmd.readFileList(["macrotests/imgs/arm0.png", "macrotests/imgs"])
-        self.assertEqual(fl,  ['macrotests/imgs/arm0.png',
-                                'macrotests/imgs/arm0.png',
-                                'macrotests/imgs/arm1.png',
-                                'macrotests/imgs/arm2.png',
-                                'macrotests/imgs/Boss-0.png',
-                                'macrotests/imgs/Boss-1.png',
-                                'macrotests/imgs/cover0.png',
-                                'macrotests/imgs/cover1.png',
-                                'macrotests/imgs/cover2.png'] )
-
 

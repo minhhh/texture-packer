@@ -5,26 +5,36 @@ from ar.com.hjg.pngj import PngReader, PngWriter, ImageLineHelper, ImageInfo, Im
 from ar.com.hjg.pngj.chunks import PngChunkPLTE, ChunksList, PngChunkIHDR, PngChunkTRNS
 import java
 from java.nio import ByteBuffer
+import codecs
 
 ARGS = {}
+MR_HEURISTICS = {
+    "shortsidefit": maxrect.MRHeuristicsType.RECTBESTSHORTSIDEFIT,
+    "longsidefit": maxrect.MRHeuristicsType.RECTBESTLONGSIDEFIT,
+    "bottomleft": maxrect.MRHeuristicsType.RECTBOTTOMLEFT,
+    "contactpoint": maxrect.MRHeuristicsType.RECTBESTAREAFIT,
+    "areafit": maxrect.MRHeuristicsType.RECTBESTAREAFIT,
+    "best": maxrect.MRHeuristicsType.RECTBESTFIT
+}
 
-def readFileList(fl):
+
+def read_file_list(fl):
     result = []
     for filename in fl:
         if os.path.isfile(filename):
             result.append(filename)
         elif os.path.isdir(filename):
-            result += readDirImgs(filename)
+            result += read_dir_imgs(filename)
     return result
 
-def readDirImgs(dir):
+def read_dir_imgs(dir):
     result = []
     for (dirpath, dirnames, filenames) in walk(dir):
         for filename in [f for f in filenames if os.path.splitext(f)[1] == '.png']:
             result.append(dirpath + os.path.sep + filename)
     return result
 
-def readImageInfo(filelist):
+def read_image_info(filelist):
     result = []
     pr = None
     for file in filelist:
@@ -37,16 +47,23 @@ def readImageInfo(filelist):
 
     return result
 
-def tryFit(frmObjs, width, height, heuristics, allow_rotation, shape_padding, border_padding):
-    heuristicsCls = maxrect.MRHeuristicsType.get(heuristics)
-
-    mr = maxrect.MaxRects(width, height, heuristicsCls(allow_rotation, shape_padding, border_padding), shape_padding, border_padding)
-    return mr.insertFrmObjs(frmObjs)
+def try_fit(frm_objs, width, height, heuristics, allow_rotation, shape_padding, border_padding):
+    if heuristics == maxrect.MRHeuristicsType.RECTBESTFIT:
+        for i in range(maxrect.MRHeuristicsType.RECTBESTFIT):
+            heuristicsCls = maxrect.MRHeuristicsType.get(i)
+            mr = maxrect.MaxRects(width, height, heuristicsCls(allow_rotation, shape_padding, border_padding), shape_padding, border_padding)
+            if mr.insert_frm_objs(frm_objs):
+                return True
+        return False
+    else:
+        heuristicsCls = maxrect.MRHeuristicsType.get(heuristics)
+        mr = maxrect.MaxRects(width, height, heuristicsCls(allow_rotation, shape_padding, border_padding), shape_padding, border_padding)
+        return mr.insert_frm_objs(frm_objs)
 
 TWO_MAXINT = 2 * sys.maxint + 2
-def getFileData(frmObjs):
+def get_file_data(frm_objs):
     result = []
-    for frmObj in frmObjs:
+    for frmObj in frm_objs:
         pr = None
         try:
             if ARGS['--verbose']:
@@ -55,8 +72,6 @@ def getFileData(frmObjs):
             imgData = []
             pal, trns = None, None
             pal = pr.getMetadata().getPLTE()
-            # trns = pr.getChunksList().getById(PngChunkTRNS.ID)
-            # trns = trns[0] if len(trns) else None
             trns = pr.getMetadata().getTRNS()
 
             for i in range(pr.imgInfo.rows):
@@ -108,7 +123,7 @@ def getFileData(frmObjs):
                 pr.close()
     return result
 
-def getPixelRGBA(imgData, row, col):
+def get_pixel_RGBA(imgData, row, col):
     for data in imgData:
         if data["frmObj"].rotated:
             if col >= data["frmObj"].frame.x \
@@ -124,7 +139,7 @@ def getPixelRGBA(imgData, row, col):
                 return data["data"][row - data["frmObj"].frame.y + data["frmObj"].offset[1]][col - data["frmObj"].frame.x + data["frmObj"].offset[0]]
     return 0
 
-def packImages(imageDataList, width, height, args):
+def pack_images(imageDataList, width, height, args):
     result = True
     oFile = java.io.File(args['--texture'])
     wr = None
@@ -134,7 +149,7 @@ def packImages(imageDataList, width, height, args):
         for i in range(height):
             imgLine = ImageLineInt(imi)
             for j in range(width):
-                pixel = getPixelRGBA(imageDataList, i, j)
+                pixel = get_pixel_RGBA(imageDataList, i, j)
                 ImageLineHelper.setPixelRGBA8(imgLine, j, pixel)
             wr.writeRow(imgLine)
         wr.end()
@@ -146,7 +161,7 @@ def packImages(imageDataList, width, height, args):
             wr.close()
     return result
 
-def processImages(frmObjs, args):
+def process_images(frm_objs, args):
     allow_rotation = not args['--no-rotation']
     heuristics = MR_HEURISTICS[args["--maxrects-heuristics"]]
 
@@ -171,20 +186,20 @@ def processImages(frmObjs, args):
     if fixed_size:
         width = height = fixed_size
 
-    total_area, canFit, failed = cal_total_area(frmObjs), False, False
-    while not canFit and not failed:
+    total_area, can_fit, failed = cal_total_area(frm_objs), False, False
+    while not can_fit and not failed:
         if width * height < total_area:
-            canFit = False
+            can_fit = False
         else:
-            canFit = tryFit(frmObjs, width, height, heuristics, allow_rotation, shape_padding, border_padding)
-        if not canFit:
+            can_fit = try_fit(frm_objs, width, height, heuristics, allow_rotation, shape_padding, border_padding)
+        if not can_fit:
             failed, width, height = scale_size(width, height, fixed_width, fixed_height, max_width, max_height, fixed_size, max_size)
 
-    return canFit, width, height
+    return can_fit, width, height
 
-def cal_total_area(frmObjs):
+def cal_total_area(frm_objs):
     result = 0
-    for frmObj in frmObjs:
+    for frmObj in frm_objs:
         result += frmObj.sourceColorRect.w * frmObj.sourceColorRect.h
 
     return result
@@ -217,8 +232,13 @@ def scale_size(width, height, fixed_width, fixed_height, max_width, max_height, 
 
     return failed_scale, new_width, new_height
 
-def packData(frmObjs, width, height, args):
-    fp = None
+def pack_data(frm_objs, width, height, output_file):
+    file_ext = os.path.splitext(output_file)
+    print file_ext
+    if file_ext == '.plist':
+        pack_data_plist(frm_objs, width, height, output_file)
+
+def pack_data_plist(frm_objs, width, height, output_file):
     header = """
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -237,40 +257,26 @@ def packData(frmObjs, width, height, args):
         </dict>
     </dict>
 </plist>""" % (width, height)
-    oFn = args['--data']
-    try:
-        fp = open(oFn, 'w')
-        fp.write(header)
-        for frm in frmObjs:
-            fp.write(maxrect.DataExporter.exportToJson(frm))
-        fp.write(tail)
-    finally:
-        if fp:
-            fp.close()
-
-
-MR_HEURISTICS = {
-    "shortsidefit":0,
-    "longsidefit":1,
-    "bottomleft":2,
-    "contactpoint":3,
-    "areafit":4,
-    "best":5
-}
+    oFn = output_file
+    with codecs.open(oFn, 'w', encoding='utf-8') as fh:
+        fh.write(header)
+        for frm in frm_objs:
+            fh.write(maxrect.DataExporter.export_to_json(frm))
+        fh.write(tail)
 
 def launch(args):
     global ARGS
     ARGS = args
-    filelist = readFileList(args['FILE'])
-    frmObjs = readImageInfo(filelist)
+    filelist = read_file_list(args['FILE'])
+    frm_objs = read_image_info(filelist)
 
-    canFit, width, height = processImages(frmObjs, args)
-    if canFit:
-        packImages(getFileData(frmObjs), width, height, args)
-        packData(frmObjs, width, height, args)
+    can_fit, width, height = process_images(frm_objs, args)
+    if can_fit:
+        pack_images(get_file_data(frm_objs), width, height, args)
+        pack_data(frm_objs, width, height, args['--data'])
     else:
         print "Cannot pack images!"
 
-    # for fileinfo in frmObjs:
+    # for fileinfo in frm_objs:
     #     print fileinfo
 

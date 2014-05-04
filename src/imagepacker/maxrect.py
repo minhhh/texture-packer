@@ -1,4 +1,4 @@
-import os, sys, copy
+import os, sys, copy, const
 
 def overrides(interface_class):
     def overrider(method):
@@ -29,17 +29,15 @@ class PixelRect(object):
 
 class MRHeuristicsType(object):
     RECTBESTSHORTSIDEFIT = 0
-    RECTBOTTOMLEFTRULE   = 1
-    RECTCONTACTPOINTRULE = 2
-    RECTBESTLONGSIDEFIT  = 3
+    RECTBESTLONGSIDEFIT  = 1
+    RECTBOTTOMLEFT       = 1
+    RECTCONTACTPOINT     = 2
     RECTBESTAREAFIT      = 4
-    RECTBESTAREAFIT      = 5
+    RECTBESTFIT          = 5
 
     @staticmethod
     def get(i):
-        return (MRHShortSideFit, MRHShortSideFit, MRHShortSideFit, MRHShortSideFit, MRHShortSideFit, MRHShortSideFit)[i]
-
-MAX              = sys.maxsize
+        return (MRHShortSideFit, MRHLongSideFit, MRHShortSideFit, MRHShortSideFit, MRHBestAreaFit, MRHShortSideFit)[i]
 
 class MRHeuristics(object):
     def __init__(self, allow_rotation=False, shape_padding=0, border_padding=0):
@@ -51,16 +49,16 @@ class MRHeuristics(object):
     def classname(self):
         return self.__class__.__name__
 
-    def placeFrame(self, w, h, freeRects, rw, rh):
+    def place_frame(self, w, h, freeRects, rw, rh):
         return None, None
 
 class MRHLongSideFit(MRHeuristics):
 
     @overrides(MRHeuristics)
-    def placeFrame(self, w, h, freeRects, rw, rh):
+    def place_frame(self, w, h, freeRects, rw, rh):
         rotated = False
         result = PixelRect()
-        bestShortSide = bestLongSide = MAX
+        bestShortSide = bestLongSide = const.MAX
         for r in freeRects:
             if r.w >= rw and r.h >= rh:
                 gapw = r.w - rw
@@ -86,16 +84,16 @@ class MRHLongSideFit(MRHeuristics):
                         bestShortSide = shortSide
                         bestLongSide = longSide
                         result = PixelRect(r.x, r.y, rw, rh)
-        if bestShortSide == MAX:
+        if bestShortSide == const.MAX:
             return None, None
         return result, rotated
 
 class MRHShortSideFit(MRHeuristics):
     @overrides(MRHeuristics)
-    def placeFrame(self, w, h, freeRects, rw, rh):
+    def place_frame(self, w, h, freeRects, rw, rh):
         rotated = False
         result = PixelRect()
-        bestShortSide = bestLongSide = MAX
+        bestShortSide = bestLongSide = const.MAX
         for r in freeRects:
             if r.w >= rw and r.h >= rh:
                 gapw = r.w - rw
@@ -121,7 +119,44 @@ class MRHShortSideFit(MRHeuristics):
                         bestShortSide = shortSide
                         bestLongSide = longSide
                         result = PixelRect(r.x, r.y, rw, rh)
-        if bestShortSide == MAX:
+        if bestShortSide == const.MAX:
+            return None, None
+        return result, rotated
+
+class MRHBestAreaFit(MRHeuristics):
+    @overrides(MRHeuristics)
+    def place_frame(self, w, h, freeRects, rw, rh):
+        rotated = False
+        result = PixelRect()
+        bestAreaFit = bestShortSide = const.MAX
+        for r in freeRects:
+            if r.w >= rw and r.h >= rh:
+                gapw = r.w - rw
+                gaph = r.h - rh
+                area = r.w * r.h
+                shortSide = min(gapw, gaph)
+                longSide = max(gapw, gaph)
+                if (bestAreaFit > area or
+                    (bestAreaFit == area and
+                     bestShortSide > shortSide)):
+                        rotated = False
+                        bestShortSide = shortSide
+                        bestAreaFit = area
+                        result = PixelRect(r.x, r.y, rw, rh)
+            if self._allow_rotation and r.w >= rh and r.h >= rw:
+                gapw = r.w - rh
+                gaph = r.h - rw
+                area = r.w * r.h
+                shortSide = min(gapw, gaph)
+                longSide = max(gapw, gaph)
+                if (bestAreaFit > area or
+                    (bestAreaFit == area and
+                     bestShortSide > shortSide)):
+                        rotated = False
+                        bestShortSide = shortSide
+                        bestAreaFit = area
+                        result = PixelRect(r.x, r.y, rw, rh)
+        if bestAreaFit == const.MAX:
             return None, None
         return result, rotated
 
@@ -155,7 +190,7 @@ class FrameObject(object):
 
 class DataExporter(object):
     @staticmethod
-    def exportToJson(frmObj):
+    def export_to_json(frmObj):
         return '''
             <key>%s</key>
             <dict>
@@ -214,14 +249,14 @@ class MaxRects(object):
     def heuristics(self):
         return self._heuristics
 
-    def insertFrmObjs(self, frmObjs):
+    def insert_frm_objs(self, frmObjs):
         frmObjs.sort(key=lambda f: f.sourceColorRect.w * f.sourceColorRect.h, reverse=True)
         for frmObj in frmObjs:
-            newFrame, rotated = self.heuristics.placeFrame(self.width, self.height, self.freeRects, frmObj.sourceColorRect.w + self._shape_padding, frmObj.sourceColorRect.h + self._shape_padding)
+            newFrame, rotated = self.heuristics.place_frame(self.width, self.height, self.freeRects, frmObj.sourceColorRect.w + self._shape_padding, frmObj.sourceColorRect.h + self._shape_padding)
             if newFrame:
                 frmObj.frame = newFrame
                 frmObj.rotated = rotated
-                self.splitFreeRects(frmObj)
+                self.split_free_rects(frmObj)
             else:
                 return False
 
@@ -234,7 +269,7 @@ class MaxRects(object):
 
         return True
 
-    def splitFreeRects(self, frmObj):
+    def split_free_rects(self, frmObj):
         to_be_del = []
         rect = copy.copy(frmObj.frame)
         if frmObj.rotated:

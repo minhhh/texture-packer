@@ -15,7 +15,6 @@ public class Main {
         PySystemState sys = Py.getSystemState();
         sys.path.append(new PyString("__pyclasspath__/lib/modules.jar"));
 
-        intrp.exec("import main");
-        intrp.exec("main.main()");
+        intrp.exec("import main; main.main()");
     }
 }

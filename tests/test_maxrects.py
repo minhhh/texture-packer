@@ -28,7 +28,7 @@ class MaxRectsTest(unittest.TestCase):
         mr = maxrect.MaxRects(128, 128)
         frmObj = maxrect.FrameObject(frame=maxrect.PixelRect(0, 0, 10, 10), sourceColorRect=maxrect.PixelRect(0, 0, 10, 10), sourceSize=[10, 10])
 
-        self.assertTrue(mr.splitFreeRects(frmObj))
+        self.assertTrue(mr.split_free_rects(frmObj))
         # mr.printFreeRects()
 
     def testShortSideFit(self):
@@ -38,7 +38,7 @@ class MaxRectsTest(unittest.TestCase):
                     maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 15, 15), sourceSize=[15, 15]),
                     maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 20, 20), sourceSize=[20, 20]),
                     ]
-        mr.insertFrmObjs(frmObjs)
+        mr.insert_frm_objs(frmObjs)
 
         self.assertEqual(frmObjs[0].frame, maxrect.PixelRect(0, 0, 20, 20))
         self.assertEqual(frmObjs[1].frame, maxrect.PixelRect(0, 20, 15, 15))
@@ -52,7 +52,7 @@ class MaxRectsTest(unittest.TestCase):
                     maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 15, 15), sourceSize=[15, 15]),
                     maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 20, 20), sourceSize=[20, 20]),
                     ]
-        mr.insertFrmObjs(frmObjs)
+        mr.insert_frm_objs(frmObjs)
 
         self.assertEqual(frmObjs[0].frame, maxrect.PixelRect(0, 0, 20, 20))
         self.assertEqual(frmObjs[1].frame, maxrect.PixelRect(0, 20, 15, 15))
@@ -60,7 +60,7 @@ class MaxRectsTest(unittest.TestCase):
         self.assertEqual(frmObjs[3].frame, maxrect.PixelRect(20, 0, 10, 10))
 
 
-    def testShortSideFit(self):
+    def testLongSideFit(self):
         mr = maxrect.MaxRects(128, 256, maxrect.MRHLongSideFit(), 1, 0)
         frmObjs = [
                     maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
@@ -75,11 +75,33 @@ class MaxRectsTest(unittest.TestCase):
                     maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
                     maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
                     ]
-        mr.insertFrmObjs(frmObjs)
+        mr.insert_frm_objs(frmObjs)
 
         self.assertEqual(frmObjs[0].frame, maxrect.PixelRect(0, 0, 32, 32))
         self.assertEqual(frmObjs[1].frame, maxrect.PixelRect(0, 33, 32, 32))
         self.assertEqual(frmObjs[9].frame, maxrect.PixelRect(33, 66, 32, 32))
+        self.assertEqual(frmObjs[10].frame, maxrect.PixelRect(33, 99, 32, 32))
+
+    def testBestAreaFit(self):
+        mr = maxrect.MaxRects(128, 256, maxrect.MRHBestAreaFit(), 1, 0)
+        frmObjs = [
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    maxrect.FrameObject(sourceColorRect=maxrect.PixelRect(0, 0, 32, 32), sourceSize=[32, 32]),
+                    ]
+        mr.insert_frm_objs(frmObjs)
+
+        self.assertEqual(frmObjs[0].frame, maxrect.PixelRect(0, 0, 32, 32))
+        self.assertEqual(frmObjs[1].frame, maxrect.PixelRect(33, 0, 32, 32))
+        self.assertEqual(frmObjs[9].frame, maxrect.PixelRect(0, 99, 32, 32))
         self.assertEqual(frmObjs[10].frame, maxrect.PixelRect(33, 99, 32, 32))
 
 
