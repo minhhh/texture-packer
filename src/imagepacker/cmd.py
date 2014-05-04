@@ -234,8 +234,7 @@ def scale_size(width, height, fixed_width, fixed_height, max_width, max_height, 
 
 def pack_data(frm_objs, width, height, output_file):
     file_ext = os.path.splitext(output_file)
-    print file_ext
-    if file_ext == '.plist':
+    if file_ext[1] == '.plist':
         pack_data_plist(frm_objs, width, height, output_file)
 
 def pack_data_plist(frm_objs, width, height, output_file):
