@@ -91,9 +91,14 @@ Pack files and/or folders of images
 
 ### RELEASE NOTES
 
-Version 0.1
+Version 0.1.2
+  * Add 2 heuritics: BestAreaFit, Best
+
+Version 0.1.1
   * Add cocos2d format
   * Add 2 maxrect heuristics: BestShortSideFit, BestLongSideFit
 
 Todo
-  * Add maxrect heuristics: BestAreaFit, BottomLeft, BestContactPoint, Best
+  * Add maxrect heuristics: BottomLeft, BestContactPoint
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/nicinabox/petrie/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
