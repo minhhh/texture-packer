@@ -81,15 +81,15 @@ import sys, os
 from docopt import docopt
 from imagepacker import utils
 
+
 def main():
     try:
         arguments = docopt(__doc__, version='TexturePacker 0.1.2')
         print "Starting ..."
         import imagepacker.cmd
+
         imagepacker.cmd.launch(arguments)
     except Exception:
         utils.print_last_exception()
-        pass
     except SystemExit as e:
         print e
-        pass

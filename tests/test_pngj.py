@@ -35,8 +35,8 @@ class PngjTest(unittest.TestCase):
         oFile = java.io.File("out.png")
         wr = None
         try:
-            imi = ImageInfo(128, 128, 8, True);
-            wr = PngWriter(oFile, imi, True);
+            imi = ImageInfo(128, 128, 8, True)
+            wr = PngWriter(oFile, imi, True)
         except Exception:
             pass
         finally:

@@ -86,14 +86,14 @@ def get_file_data(frm_objs):
                             offset = j * 4
                             pixel = ((line_buf[offset + 3] & 0xff) << 24) | ((line_buf[offset] & 0xff) << 16) | ((line_buf[offset + 1] & 0xff) << 8) | ((line_buf[offset + 2] & 0xff))
                             if pixel > sys.maxint:
-                                pixel = pixel - TWO_MAXINT
+                                pixel -= TWO_MAXINT
                             buf.append(pixel)
                     else:
                         for j in range(pr.imgInfo.cols):
                             offset = j * 3
                             pixel = (-1 << 24) | ((line_buf[offset] & 0xff) << 16) | ((line_buf[offset + 1] & 0xff) << 8) | ((line_buf[offset + 2] & 0xff))
                             if pixel > sys.maxint:
-                                pixel = pixel - TWO_MAXINT
+                                pixel -= TWO_MAXINT
                             buf.append(pixel)
                 else: # RGB PNG
                     for j in range(pr.imgInfo.cols):
@@ -108,7 +108,7 @@ def get_file_data(frm_objs):
                             alpha = (line_buf[offset + 1] & 0xFF) if pr.imgInfo.alpha else (255 if g != ga else 0)
                             pixel = (alpha << 24) | ((g & 0xff) << 16) | ((g & 0xff) << 8) | ((g & 0xff))
                             if pixel > sys.maxint:
-                                pixel = pixel - TWO_MAXINT
+                                pixel -= TWO_MAXINT
                             buf.append(pixel)
                         else:
                             if pr.imgInfo.alpha:
@@ -126,15 +126,12 @@ def get_file_data(frm_objs):
 def get_pixel_RGBA(imgData, row, col):
     for data in imgData:
         if data["frmObj"].rotated:
-            if col >= data["frmObj"].frame.x \
-            and col < data["frmObj"].frame.x + data["frmObj"].frame.h \
-            and row >= data["frmObj"].frame.y \
-            and row < data["frmObj"].frame.y + data["frmObj"].frame.w:
+            if data["frmObj"].frame.x <= col < data["frmObj"].frame.x + data["frmObj"].frame.h \
+                    and data["frmObj"].frame.y <= row < data["frmObj"].frame.y + data["frmObj"].frame.w:
                 return data["data"][data["frmObj"].frame.h - 1 - col + data["frmObj"].frame.x + data["frmObj"].offset[1]][row - data["frmObj"].frame.y + data["frmObj"].offset[0]]
         else:
-            if col >= data["frmObj"].frame.x \
-            and col < data["frmObj"].frame.x + data["frmObj"].frame.w \
-            and row >= data["frmObj"].frame.y \
+            if data["frmObj"].frame.x <= col < data["frmObj"].frame.x + data["frmObj"].frame.w \
+                    and row >= data["frmObj"].frame.y \
             and row < data["frmObj"].frame.y + data["frmObj"].frame.h:
                 return data["data"][row - data["frmObj"].frame.y + data["frmObj"].offset[1]][col - data["frmObj"].frame.x + data["frmObj"].offset[0]]
     return 0
