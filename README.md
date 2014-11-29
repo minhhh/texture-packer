@@ -102,3 +102,7 @@ Todo
   * Add maxrect heuristics: BottomLeft, BestContactPoint
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/nicinabox/petrie/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/minhhh/texture-packer/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
